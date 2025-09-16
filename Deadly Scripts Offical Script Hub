@@ -1,0 +1,227 @@
+-- CONFIGURATION
+local GKey = "DS_4f9dd9e2vk95eed21okef"
+local TitleText = "🔑 Key System"
+local InfoText = "Join Discord: https://discord.gg/Ug6ZG8wXT9"
+local TextFontAll = Enum.Font.FredokaOne
+local ScriptURL = "https://raw.githubusercontent.com/DeadlyScripts/Deadly-Scripts-Hub/6a2f41ffd11b88c55f8be3251949b576c51fb21c/DS_ON_TOP"
+local executeScript = loadstring(game:HttpGet(ScriptURL, true))
+
+local RELATIVE_HOURS = 32
+local KEY_FILE = "DeadlyScripts_Key.txt"
+
+-- SERVICES
+local TweenService = game:GetService("TweenService")
+local Players = game:GetService("Players")
+local Player = Players.LocalPlayer
+
+-- Check saved key
+local savedExpire = nil
+pcall(function()
+	if isfile(KEY_FILE) then
+		savedExpire = tonumber(readfile(KEY_FILE))
+	end
+end)
+
+if savedExpire and os.time() < savedExpire then
+	-- Key still valid, execute script instantly
+	executeScript()
+	return
+end
+
+-- GUI
+local KeySystem = Instance.new("ScreenGui", Player:WaitForChild("PlayerGui"))
+KeySystem.Name = "KeySystem"
+KeySystem.IgnoreGuiInset = true
+KeySystem.ResetOnSpawn = false
+
+local KeyMain = Instance.new("Frame", KeySystem)
+KeyMain.Size = UDim2.new(0.35,0,0.35,0)
+KeyMain.Position = UDim2.new(0.5,0,0.5,0)
+KeyMain.AnchorPoint = Vector2.new(0.5,0.5)
+KeyMain.BackgroundColor3 = Color3.fromRGB(40,40,40)
+KeyMain.Active = true
+KeyMain.Draggable = true
+
+local UICorner = Instance.new("UICorner", KeyMain)
+UICorner.CornerRadius = UDim.new(0,15)
+
+local UIStroke = Instance.new("UIStroke", KeyMain)
+UIStroke.Thickness = 2
+UIStroke.Color = Color3.fromRGB(255,255,255)
+
+-- Title
+local Title = Instance.new("TextLabel", KeyMain)
+Title.Size = UDim2.new(1,0,0,40)
+Title.BackgroundTransparency = 1
+Title.Font = TextFontAll
+Title.Text = TitleText
+Title.TextColor3 = Color3.fromRGB(255,255,255)
+Title.TextScaled = true
+
+-- Info
+local Info = Instance.new("TextLabel", KeyMain)
+Info.Size = UDim2.new(1,-20,0,30)
+Info.Position = UDim2.new(0,10,0,45)
+Info.BackgroundTransparency = 1
+Info.Font = TextFontAll
+Info.Text = InfoText
+Info.TextColor3 = Color3.fromRGB(200,200,200)
+Info.TextScaled = true
+
+-- KeyBox
+local KeyBox = Instance.new("TextBox", KeyMain)
+KeyBox.Size = UDim2.new(0.7,0,0,40)
+KeyBox.Position = UDim2.new(0.5,0,0.45,0)
+KeyBox.AnchorPoint = Vector2.new(0.5,0)
+KeyBox.BackgroundColor3 = Color3.fromRGB(60,60,60)
+KeyBox.Text = ""
+KeyBox.PlaceholderText = "Enter your key..."
+KeyBox.PlaceholderColor3 = Color3.fromRGB(180,180,180)
+KeyBox.Font = TextFontAll
+KeyBox.TextColor3 = Color3.fromRGB(255,255,255)
+KeyBox.TextScaled = true
+local KeyCorner = Instance.new("UICorner", KeyBox)
+KeyCorner.CornerRadius = UDim.new(0,10)
+
+-- Feedback
+local Feedback = Instance.new("TextLabel", KeyMain)
+Feedback.Size = UDim2.new(1,0,0,25)
+Feedback.Position = UDim2.new(0.5,0,0.9,0)
+Feedback.AnchorPoint = Vector2.new(0.5,0)
+Feedback.BackgroundTransparency = 1
+Feedback.Font = TextFontAll
+Feedback.TextColor3 = Color3.fromRGB(255,0,0)
+Feedback.TextScaled = true
+
+-- Copy Discord Button
+local CopyBtn = Instance.new("TextButton", KeyMain)
+CopyBtn.Size = UDim2.new(0.4,0,0,35)
+CopyBtn.Position = UDim2.new(0.25,0,0.7,0)
+CopyBtn.AnchorPoint = Vector2.new(0.5,0)
+CopyBtn.BackgroundColor3 = Color3.fromRGB(80,80,80)
+CopyBtn.Text = "Copy Invite"
+CopyBtn.TextColor3 = Color3.fromRGB(255,255,255)
+CopyBtn.Font = TextFontAll
+CopyBtn.TextScaled = true
+local CopyCorner = Instance.new("UICorner", CopyBtn)
+CopyCorner.CornerRadius = UDim.new(0,10)
+
+-- Key Website Button
+local WebBtn = Instance.new("TextButton", KeyMain)
+WebBtn.Size = UDim2.new(0.4,0,0,35)
+WebBtn.Position = UDim2.new(0.75,0,0.7,0)
+WebBtn.AnchorPoint = Vector2.new(0.5,0)
+WebBtn.BackgroundColor3 = Color3.fromRGB(80,80,80)
+WebBtn.Text = "Key Website"
+WebBtn.TextColor3 = Color3.fromRGB(255,255,255)
+WebBtn.Font = TextFontAll
+WebBtn.TextScaled = true
+local WebCorner = Instance.new("UICorner", WebBtn)
+WebCorner.CornerRadius = UDim.new(0,10)
+
+-- Button functions
+CopyBtn.MouseButton1Click:Connect(function()
+	setclipboard("https://discord.gg/Ug6ZG8wXT9")
+	Feedback.Text = "✅ Invite copied!"
+	Feedback.TextColor3 = Color3.fromRGB(0,255,0)
+	task.delay(2,function() Feedback.Text="" end)
+end)
+
+WebBtn.MouseButton1Click:Connect(function()
+	setclipboard("https://rekonise.com/key-system-1-fzehn")
+	Feedback.Text = "🌐 Website link copied!"
+	Feedback.TextColor3 = Color3.fromRGB(0,200,255)
+	task.delay(2,function() Feedback.Text="" end)
+end)
+
+-- Time formatting
+local function formatTime(sec)
+	local h = math.floor(sec/3600)
+	local m = math.floor((sec%3600)/60)
+	local s = sec%60
+	return string.format("%dh %dm %ds",h,m,s)
+end
+
+-- Show countdown immediately for 20 seconds if saved key exists
+if savedExpire and savedExpire > os.time() then
+	local remain = savedExpire - os.time()
+	local initialLabel = Instance.new("TextLabel", KeyMain)
+	initialLabel.Size = UDim2.new(0,150,0,25)
+	initialLabel.Position = UDim2.new(0,10,0,10)
+	initialLabel.BackgroundTransparency = 1
+	initialLabel.Font = TextFontAll
+	initialLabel.TextColor3 = Color3.fromRGB(255,200,0)
+	initialLabel.TextScaled = true
+
+	task.spawn(function()
+		local timer = 0
+		while remain > 0 and timer < 20 and initialLabel.Parent do
+			remain = savedExpire - os.time()
+			initialLabel.Text = "⏳ Expires in "..formatTime(remain)
+			timer = timer + 1
+			task.wait(1)
+		end
+		if initialLabel.Parent then
+			initialLabel:Destroy()
+		end
+	end)
+end
+
+-- Key check function
+local function checkKey()
+	if KeyBox.Text == GKey then
+		local expire = os.time() + (RELATIVE_HOURS*60*60)
+		pcall(function() writefile(KEY_FILE,tostring(expire)) end)
+
+		Feedback.Text = "✅ Correct Key!"
+		Feedback.TextColor3 = Color3.fromRGB(0,255,0)
+
+		-- Countdown label
+		local CountLabel = Instance.new("TextLabel",KeyMain)
+		CountLabel.Size = UDim2.new(1,0,0,25)
+		CountLabel.Position = UDim2.new(0.5,0,0.95,0)
+		CountLabel.AnchorPoint = Vector2.new(0.5,0)
+		CountLabel.BackgroundTransparency = 1
+		CountLabel.Font = TextFontAll
+		CountLabel.TextColor3 = Color3.fromRGB(255,200,0)
+		CountLabel.TextScaled = true
+
+		task.spawn(function()
+			while os.time() < expire and CountLabel.Parent do
+				local remain = expire - os.time()
+				CountLabel.Text = "⏳ Expires in "..formatTime(remain)
+				task.wait(1)
+			end
+			if os.time() >= expire then
+				CountLabel.Text = "⏰ Key expired!"
+				CountLabel.TextColor3 = Color3.fromRGB(255,0,0)
+				KeyBox.Focusable = false
+				CopyBtn.Active = false
+				WebBtn.Active = false
+			end
+		end)
+
+		-- Fade out GUI
+		TweenService:Create(KeyMain,TweenInfo.new(1.5),{BackgroundTransparency=1}):Play()
+		TweenService:Create(KeyBox,TweenInfo.new(1.5),{BackgroundTransparency=1}):Play()
+		TweenService:Create(Title,TweenInfo.new(1.5),{TextTransparency=1}):Play()
+		TweenService:Create(Info,TweenInfo.new(1.5),{TextTransparency=1}):Play()
+		TweenService:Create(Feedback,TweenInfo.new(1.5),{TextTransparency=1}):Play()
+		TweenService:Create(CopyBtn,TweenInfo.new(1.5),{BackgroundTransparency=1,TextTransparency=1}):Play()
+		TweenService:Create(WebBtn,TweenInfo.new(1.5),{BackgroundTransparency=1,TextTransparency=1}):Play()
+
+		task.wait(1.5)
+		KeySystem:Destroy()
+		executeScript()
+	else
+		Feedback.Text = "❌ Wrong Key!"
+		Feedback.TextColor3 = Color3.fromRGB(255,0,0)
+		KeyBox.Text=""
+	end
+end
+
+KeyBox.FocusLost:Connect(function(enterPressed)
+	if enterPressed then
+		checkKey()
+	end
+end)
