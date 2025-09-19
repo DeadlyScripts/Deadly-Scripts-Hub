@@ -652,20 +652,15 @@ function OrionLib:MakeWindow(WindowConfig)
 
 	MakeDraggable(DragPoint, MainWindow)
 
-    -- // OPEN HUB BUTTON (auto-inserted by patch)
+    -- // OPEN HUB BUTTON (Image + Square + Bigger)
     local function CreateOpenButton()
-        local OpenBtn = Instance.new("TextButton")
+        local OpenBtn = Instance.new("ImageButton")
         OpenBtn.Name = "OpenHubButton"
-        OpenBtn.Size = UDim2.new(0,120,0,36)
+        OpenBtn.Size = UDim2.new(0, 60, 0, 60) -- square & bigger
         OpenBtn.Position = UDim2.new(0, 20, 0.8, 0)
-        OpenBtn.AnchorPoint = Vector2.new(0,0)
-        OpenBtn.BackgroundColor3 = OrionLib.Themes[OrionLib.SelectedTheme].Main or Color3.fromRGB(28,28,28)
+        OpenBtn.BackgroundColor3 = Color3.fromRGB(30,30,30)
         OpenBtn.BorderSizePixel = 0
-        OpenBtn.AutoButtonColor = false
-        OpenBtn.Text = "Open Hub"
-        OpenBtn.Font = Enum.Font.GothamBold
-        OpenBtn.TextSize = 14
-        OpenBtn.TextColor3 = OrionLib.Themes[OrionLib.SelectedTheme].Text or Color3.fromRGB(240,240,240)
+        OpenBtn.Image = "rbxassetid://84608313891164" -- custom image
         OpenBtn.Parent = Orion
         OpenBtn.Visible = false
 
