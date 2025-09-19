@@ -652,25 +652,70 @@ function OrionLib:MakeWindow(WindowConfig)
 
 	MakeDraggable(DragPoint, MainWindow)
 
-    -- // OPEN HUB BUTTON (Image + Square + Bigger)
+    -- // OPEN HUB BUTTON (Image + Square + Bigger + Draggable + Centered + Circle Corner)
     local function CreateOpenButton()
+        local UIS = game:GetService("UserInputService")
+
         local OpenBtn = Instance.new("ImageButton")
         OpenBtn.Name = "OpenHubButton"
-        OpenBtn.Size = UDim2.new(0, 60, 0, 60) -- square & bigger
-        OpenBtn.Position = UDim2.new(0, 20, 0.8, 0)
+        OpenBtn.Size = UDim2.new(0, 60, 0, 60)
+        OpenBtn.Position = UDim2.new(0.5, -30, 0.5, -30) -- centered
         OpenBtn.BackgroundColor3 = Color3.fromRGB(30,30,30)
         OpenBtn.BorderSizePixel = 0
-        OpenBtn.Image = "rbxassetid://84608313891164" -- custom image
+        OpenBtn.Image = "rbxassetid://84608313891164"
         OpenBtn.Parent = Orion
         OpenBtn.Visible = false
 
+        -- make corners rounded (circle corner)
+        local corner = Instance.new("UICorner")
+        corner.CornerRadius = UDim.new(1, 0)
+        corner.Parent = OpenBtn
+
+        -- show button when hub is hidden
         AddConnection(MainWindow:GetPropertyChangedSignal("Visible"), function()
             OpenBtn.Visible = not MainWindow.Visible
         end)
 
+        -- reopen hub
         AddConnection(OpenBtn.MouseButton1Click, function()
             MainWindow.Visible = true
             OpenBtn.Visible = false
+        end)
+
+        -- make button draggable
+        local dragging, dragInput, dragStart, startPos
+        local function update(input)
+            local delta = input.Position - dragStart
+            OpenBtn.Position = UDim2.new(
+                startPos.X.Scale, startPos.X.Offset + delta.X,
+                startPos.Y.Scale, startPos.Y.Offset + delta.Y
+            )
+        end
+
+        OpenBtn.InputBegan:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                dragging = true
+                dragStart = input.Position
+                startPos = OpenBtn.Position
+
+                input.Changed:Connect(function()
+                    if input.UserInputState == Enum.UserInputState.End then
+                        dragging = false
+                    end
+                end)
+            end
+        end)
+
+        OpenBtn.InputChanged:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseMovement then
+                dragInput = input
+            end
+        end)
+
+        UIS.InputChanged:Connect(function(input)
+            if input == dragInput and dragging then
+                update(input)
+            end
         end)
     end
     pcall(CreateOpenButton)
