@@ -1771,11 +1771,25 @@ end
 return OrionLib
 
 
--- // ADD OPEN BUTTON (Deadly Scripts Patch)
+-- // ADD OPEN BUTTON (Fixed Deadly Scripts Patch)
 task.spawn(function()
     local Orion = game.CoreGui:WaitForChild("Orion")
-    local MainWindow = Orion:FindFirstChildWhichIsA("Frame")
+    local MainWindow
 
+    -- find the real window (largest visible frame)
+    for _, obj in pairs(Orion:GetDescendants()) do
+        if obj:IsA("Frame") and obj.Visible and obj.AbsoluteSize.X > 200 and obj.AbsoluteSize.Y > 100 then
+            MainWindow = obj
+            break
+        end
+    end
+
+    if not MainWindow then
+        warn("Open Button: Could not find OrionLib Main Window")
+        return
+    end
+
+    -- create open button
     local OpenBtn = Instance.new("TextButton")
     OpenBtn.Name = "OpenHubButton"
     OpenBtn.Size = UDim2.new(0, 120, 0, 40)
@@ -1788,6 +1802,7 @@ task.spawn(function()
     OpenBtn.Parent = Orion
     OpenBtn.Visible = false
 
+    -- show button when hub is hidden
     MainWindow:GetPropertyChangedSignal("Visible"):Connect(function()
         if MainWindow.Visible then
             OpenBtn.Visible = false
@@ -1796,6 +1811,7 @@ task.spawn(function()
         end
     end)
 
+    -- reopen hub when button is clicked
     OpenBtn.MouseButton1Click:Connect(function()
         MainWindow.Visible = true
         OpenBtn.Visible = false
