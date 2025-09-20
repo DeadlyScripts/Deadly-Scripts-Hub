@@ -652,39 +652,51 @@ function OrionLib:MakeWindow(WindowConfig)
 
 	MakeDraggable(DragPoint, MainWindow)
 
-    -- // OPEN HUB BUTTON (Image + Square + Bigger + Draggable + Centered + Circle Corner)
+    
+    -- // OPEN HUB BUTTON (Rounded Square + Inner Image + Draggable)
     local function CreateOpenButton()
         local UIS = game:GetService("UserInputService")
 
         local OpenBtn = Instance.new("ImageButton")
         OpenBtn.Name = "OpenHubButton"
         OpenBtn.Size = UDim2.new(0, 60, 0, 60)
-        OpenBtn.Position = UDim2.new(0.5, -30, 0.5, -30) -- centered
+        OpenBtn.Position = UDim2.new(0.5, -30, 0.5, -30)
         OpenBtn.BackgroundColor3 = Color3.fromRGB(30,30,30)
         OpenBtn.BorderSizePixel = 0
-        OpenBtn.Image = "rbxassetid://84608313891164"
+        OpenBtn.Image = "" 
         OpenBtn.Parent = Orion
         OpenBtn.Visible = false
 
-        -- make corners rounded (circle corner)
         local corner = Instance.new("UICorner")
-        corner.CornerRadius = UDim.new(1, 0)
+        corner.CornerRadius = UDim.new(0, 8)
         corner.Parent = OpenBtn
 
-        -- show button when hub is hidden
+        local InnerImage = Instance.new("ImageLabel")
+        InnerImage.Name = "InnerIcon"
+        InnerImage.Size = UDim2.new(1, -8, 1, -8)
+        InnerImage.Position = UDim2.new(0, 4, 0, 4)
+        InnerImage.BackgroundTransparency = 1
+        InnerImage.ScaleType = Enum.ScaleType.Fit
+        InnerImage.Image = "rbxassetid://84608313891164"
+        InnerImage.Parent = OpenBtn
+
+        local innerCorner = Instance.new("UICorner")
+        innerCorner.CornerRadius = UDim.new(0, 6)
+        innerCorner.Parent = InnerImage
+
         AddConnection(MainWindow:GetPropertyChangedSignal("Visible"), function()
             OpenBtn.Visible = not MainWindow.Visible
         end)
 
-        -- reopen hub
         AddConnection(OpenBtn.MouseButton1Click, function()
             MainWindow.Visible = true
             OpenBtn.Visible = false
         end)
 
-        -- make button draggable
-        local dragging, dragInput, dragStart, startPos
+        local dragging, dragInput, dragStart, startPos = false, nil, nil, nil
+
         local function update(input)
+            if not (dragStart and startPos) then return end
             local delta = input.Position - dragStart
             OpenBtn.Position = UDim2.new(
                 startPos.X.Scale, startPos.X.Offset + delta.X,
@@ -693,7 +705,7 @@ function OrionLib:MakeWindow(WindowConfig)
         end
 
         OpenBtn.InputBegan:Connect(function(input)
-            if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
                 dragging = true
                 dragStart = input.Position
                 startPos = OpenBtn.Position
@@ -701,13 +713,14 @@ function OrionLib:MakeWindow(WindowConfig)
                 input.Changed:Connect(function()
                     if input.UserInputState == Enum.UserInputState.End then
                         dragging = false
+                        dragInput = nil
                     end
                 end)
             end
         end)
 
         OpenBtn.InputChanged:Connect(function(input)
-            if input.UserInputType == Enum.UserInputType.MouseMovement then
+            if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
                 dragInput = input
             end
         end)
@@ -719,6 +732,7 @@ function OrionLib:MakeWindow(WindowConfig)
         end)
     end
     pcall(CreateOpenButton)
+
 
 
 
