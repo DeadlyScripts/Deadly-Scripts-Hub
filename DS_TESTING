@@ -1,9 +1,19 @@
--- Draggable Orion Lib for both pc and mobile!
+-- Draggable  for both pc and mobile!
 
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
 local LocalPlayer = game:GetService("Players").LocalPlayer
+-- ===== Whitelist System (inserted) =====
+-- Add premium user IDs here (replace with real Roblox UserIds)
+local PremiumUsers = {
+    [8933189573] = true, -- example: Replace with actual UserId
+    [123] = true
+}
+
+local IsPremium = PremiumUsers[LocalPlayer.UserId] or false
+-- ===== End Whitelist System =====
+
 local Mouse = LocalPlayer:GetMouse()
 local HttpService = game:GetService("HttpService")
 
@@ -1853,3 +1863,32 @@ function OrionLib:Destroy()
 end
 
 return OrionLib
+
+
+-- NOTE: Premium label code appended by merge tool
+-- ===== Premium Label Display (inserted) =====
+-- Show "Premium" at the bottom only for whitelisted users.
+-- This will wait for the Orion GUI to exist and locate the small bottom label slot.
+spawn(function()
+    local OrionGui = game.CoreGui:WaitForChild("Orion", 10)
+    if not OrionGui then return end
+
+    local bottomLabel = nil
+    for _, child in ipairs(OrionGui:GetDescendants()) do
+        if child:IsA("TextLabel") and child.Size == UDim2.new(1, -60, 0, 12) then
+            bottomLabel = child
+            break
+        end
+    end
+
+    if bottomLabel then
+        if IsPremium then
+            bottomLabel.Text = "Premium"
+            bottomLabel.TextColor3 = Color3.fromRGB(9, 255, 120) -- green highlight
+        else
+            bottomLabel.Text = "" -- leave empty for non-premium users
+        end
+    end
+end)
+-- ===== End Premium Label Display =====
+
