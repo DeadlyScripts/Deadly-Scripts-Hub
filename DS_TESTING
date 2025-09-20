@@ -1866,36 +1866,85 @@ end
 return OrionLib
 
 
--- ===== Premium Label Display (inserted) =====
--- Replaces Orion's bottom label with "Premium" if user is whitelisted
+-- ===== Premium Label Display (robust) =====
+-- Finds the bottom label by position/size heuristics and sets "Premium" if whitelisted.
 spawn(function()
-    local OrionGui = game.CoreGui:WaitForChild("Orion", 15)
+    local OrionGui = nil
+    local ok = pcall(function()
+        OrionGui = game.CoreGui:WaitForChild("Orion", 20)
+    end)
+    if not OrionGui or not OrionGui.Parent then
+        OrionGui = game:GetService("CoreGui"):FindFirstChild("Orion") or game:GetService("StarterGui"):FindFirstChild("Orion")
+    end
     if not OrionGui then
-        warn("[Premium] Orion GUI not found")
+        warn("[Premium] Orion GUI not found. Make sure the main UI script created it and HidePremium = false.")
         return
     end
 
+    -- wait a small moment for UI to finish constructing
+    wait(0.2)
+
     local bottomLabel = nil
     for _, child in ipairs(OrionGui:GetDescendants()) do
-        if child:IsA("TextLabel") and string.find(string.lower(child.Text), "made by") then
-            bottomLabel = child
-            break
+        if child:IsA("TextLabel") then
+            local success, pXScale, pXOff, pYScale, pYOff, sXScale, sXOff, sYScale, sYOff, tSize = pcall(function()
+                return child.Position.X.Scale, child.Position.X.Offset, child.Position.Y.Scale, child.Position.Y.Offset, child.Size.X.Scale, child.Size.X.Offset, child.Size.Y.Scale, child.Size.Y.Offset, child.TextSize
+            end)
+            -- Heuristics:
+            -- 1) Label positioned near bottom of the window (Y.Scale >= 0.9 or Y.Offset <= -10)
+            -- 2) Small height (Size.Y.Offset <= 20 or TextSize small)
+            if success then
+                local nearBottom = (type(pYScale) == 'number' and pYScale >= 0.8) or (type(pYOff) == 'number' and pYOff <= -5)
+                local smallHeight = (type(sYOff) == 'number' and sYOff <= 20) or (type(tSize) == 'number' and (tSize <= 14))
+                if nearBottom and smallHeight then
+                    bottomLabel = child
+                    break
+                end
+            end
+        end
+    end
+
+    -- Fallback: choose first small, empty TextLabel under Orion
+    if not bottomLabel then
+        for _, child in ipairs(OrionGui:GetDescendants()) do
+            if child:IsA("TextLabel") and child.Text == "" then
+                local ok2, sYOff = pcall(function() return child.Size.Y.Offset end)
+                if ok2 and sYOff and sYOff <= 20 then
+                    bottomLabel = child
+                    break
+                end
+            end
         end
     end
 
     if not bottomLabel then
-        warn("[Premium] Could not find bottom label. Make sure HidePremium = false.")
+        warn("[Premium] Could not find candidate bottom label. Dumping small labels for debug:")
+        local found = 0
+        for _, child in ipairs(OrionGui:GetDescendants()) do
+            if child:IsA("TextLabel") then
+                local ok3, sy = pcall(function() return child.Size.Y.Offset end)
+                if ok3 and sy and sy <= 20 then
+                    found = found + 1
+                    print(string.format("[Premium DEBUG] %d: %s | Text='%s' | Pos=%s | Size=%s | TextSize=%s", found, child:GetFullName(), child.Text, tostring(child.Position), tostring(child.Size), tostring(child.TextSize)))
+                    if found >= 20 then break end
+                end
+            end
+        end
         return
     end
 
+    print("[Premium] Using bottom label:", bottomLabel:GetFullName(), "Text:", bottomLabel.Text, "Pos:", tostring(bottomLabel.Position), "Size:", tostring(bottomLabel.Size))
+
     if IsPremium then
-        bottomLabel.Text = "Premium"
-        bottomLabel.TextColor3 = Color3.fromRGB(9, 255, 120)
-        print("[Premium] Premium label applied")
+        pcall(function()
+            bottomLabel.Text = "Premium"
+            bottomLabel.TextColor3 = Color3.fromRGB(9, 255, 120)
+        end)
+        print("[Premium] Premium label applied for user", game.Players.LocalPlayer.UserId)
     else
-        bottomLabel.Text = ""
-        print("[Premium] User not premium")
+        pcall(function() bottomLabel.Text = "" end)
+        print("[Premium] User not premium:", game.Players.LocalPlayer.UserId)
     end
 end)
--- ===== End Premium Label Display =====
+-- ===== End Premium Label Display (robust) =====
 
