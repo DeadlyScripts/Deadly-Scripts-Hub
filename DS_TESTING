@@ -5,12 +5,14 @@ local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
 local LocalPlayer = game:GetService("Players").LocalPlayer
 -- ===== Whitelist System (inserted) =====
--- Add premium user IDs here (replace with real numeric Roblox UserIds)
+-- Define who is premium by adding UserIds here
 local PremiumUsers = {
-    [8933189573] = true -- premium user
+    [8933189573] = true -- example: you
+    -- Add more UserIds like [123456789] = true,
 }
 
-local IsPremium = PremiumUsers[LocalPlayer.UserId] or false
+local IsPremium = PremiumUsers[game.Players.LocalPlayer.UserId] or false
+print("[DEBUG] UserId:", game.Players.LocalPlayer.UserId, "IsPremium:", IsPremium)
 -- ===== End Whitelist System =====
 
 local Mouse = LocalPlayer:GetMouse()
@@ -1864,8 +1866,8 @@ end
 return OrionLib
 
 
--- ===== Premium Label Display (updated) =====
--- Show "Premium" in bottom label only for whitelisted users
+-- ===== Premium Label Display (inserted) =====
+-- Replaces Orion's bottom label with "Premium" if user is whitelisted
 spawn(function()
     local OrionGui = game.CoreGui:WaitForChild("Orion", 15)
     if not OrionGui then
@@ -1882,17 +1884,17 @@ spawn(function()
     end
 
     if not bottomLabel then
-        warn("[Premium] Could not find bottom label. Check HidePremium = false.")
+        warn("[Premium] Could not find bottom label. Make sure HidePremium = false.")
         return
     end
 
     if IsPremium then
         bottomLabel.Text = "Premium"
         bottomLabel.TextColor3 = Color3.fromRGB(9, 255, 120)
-        print("[Premium] Label set for premium user", LocalPlayer.UserId)
+        print("[Premium] Premium label applied")
     else
         bottomLabel.Text = ""
-        print("[Premium] No premium for user", LocalPlayer.UserId)
+        print("[Premium] User not premium")
     end
 end)
 -- ===== End Premium Label Display =====
