@@ -1,4 +1,6 @@
--- Draggable Orion Lib for both pc and mobile!
+--[[Draggable Orion Lib for both pc and mobile
+btw DS made this so dont take it :P
+]]
 
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
