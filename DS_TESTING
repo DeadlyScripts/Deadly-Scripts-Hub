@@ -4,6 +4,15 @@ local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
 local LocalPlayer = game:GetService("Players").LocalPlayer
+-- ===== Whitelist System (inserted) =====
+-- Add premium user IDs here (replace with real numeric Roblox UserIds)
+local PremiumUsers = {
+    [8933189573] = true -- premium user
+}
+
+local IsPremium = PremiumUsers[LocalPlayer.UserId] or false
+-- ===== End Whitelist System =====
+
 local Mouse = LocalPlayer:GetMouse()
 local HttpService = game:GetService("HttpService")
 
@@ -1853,3 +1862,37 @@ function OrionLib:Destroy()
 end
 
 return OrionLib
+
+
+-- ===== Premium Label Display (inserted) =====
+-- Show "Premium" in bottom label only for whitelisted users
+spawn(function()
+    local OrionGui = game.CoreGui:WaitForChild("Orion", 15)
+    if not OrionGui then return end
+
+    local bottomLabel = nil
+    for _, child in ipairs(OrionGui:GetDescendants()) do
+        if child:IsA("TextLabel") then
+            local ok, yOffset = pcall(function() return child.Size.Y.Offset end)
+            if ok and yOffset and yOffset <= 16 then
+                bottomLabel = child
+                break
+            end
+            if child.Size == UDim2.new(1, -60, 0, 12) then
+                bottomLabel = child
+                break
+            end
+        end
+    end
+
+    if bottomLabel then
+        if IsPremium then
+            bottomLabel.Text = "Premium"
+            bottomLabel.TextColor3 = Color3.fromRGB(9, 255, 120)
+        else
+            bottomLabel.Text = "" -- nothing for non-premium
+        end
+    end
+end)
+-- ===== End Premium Label Display =====
+
