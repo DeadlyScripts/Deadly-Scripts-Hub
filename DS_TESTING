@@ -4,11 +4,10 @@ local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
 local LocalPlayer = game:GetService("Players").LocalPlayer
--- ===== Whitelist System =====
--- Add premium user IDs here
+-- ===== Whitelist System (inserted) =====
+-- Add premium user IDs here (replace with real numeric Roblox UserIds)
 local PremiumUsers = {
-    [8933189573] = true, -- replace with real UserIds
-    [987654321] = true  -- add more as needed
+    [8933189573] = true -- premium user
 }
 
 local IsPremium = PremiumUsers[LocalPlayer.UserId] or false
@@ -1865,17 +1864,26 @@ end
 return OrionLib
 
 
--- ===== Premium Label Display =====
+-- ===== Premium Label Display (inserted) =====
 -- Show "Premium" in bottom label only for whitelisted users
 spawn(function()
-    local OrionGui = game.CoreGui:WaitForChild("Orion", 10)
+    local OrionGui = game.CoreGui:WaitForChild("Orion", 15)
     if not OrionGui then return end
 
     local bottomLabel = nil
     for _, child in ipairs(OrionGui:GetDescendants()) do
-        if child:IsA("TextLabel") and child.Size == UDim2.new(1, -60, 0, 12) then
-            bottomLabel = child
-            break
+        if child:IsA("TextLabel") then
+            -- match likely bottom label by small height or matching size used in Orion
+            local ok, yOffset = pcall(function() return child.Size.Y.Offset end)
+            if ok and yOffset and yOffset <= 16 then
+                bottomLabel = child
+                break
+            end
+            -- fallback exact match
+            if child.Size == UDim2.new(1, -60, 0, 12) then
+                bottomLabel = child
+                break
+            end
         end
     end
 
