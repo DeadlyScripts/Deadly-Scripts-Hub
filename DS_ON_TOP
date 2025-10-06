@@ -1,4 +1,4 @@
-local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/jensonhirst/Orion/main/source')))()
+local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/DeadlyScripts/Deadly-Scripts-Hub/refs/heads/main/DS_TESTING')))()
 
 local Window = OrionLib:MakeWindow({Name = "Deadly Scripts Hub🔥", HidePremium = false, SaveConfig = true, ConfigFolder = "OrionTest"})
 
@@ -65,3 +65,21 @@ loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Nameless-ad
 
   	end    
 })
+
+
+
+local Tab3 = Window:MakeTab({
+	Name = "FTAP",
+	Icon = "rbxassetid://4483345998",
+	PremiumOnly = false
+})
+
+
+Tab3:AddButton({
+	Name = "Blitz FTAP",
+	Callback = function()
+loadstring(game:HttpGet("https://rawscripts.net/raw/Fling-Things-and-People-FTAP-BLITZ-43504"))()
+
+  	end    
+})
+
