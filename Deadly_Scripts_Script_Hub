@@ -1,5 +1,5 @@
 -- CONFIGURATION
-local GKey = "DS_r21ee93821f82e”
+local GKey = "DS_a9b7c3d5f1g8h6j4k2l9m0n3q5r7t”
 local TitleText = "🔑 Key System"
 local InfoText = "Join Discord: https://discord.gg/Ug6ZG8wXT9"
 local TextFontAll = Enum.Font.FredokaOne
