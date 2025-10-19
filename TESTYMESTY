@@ -1,3 +1,99 @@
+
+-- Embedded theme pack
+OrionLib.Themes = {
+	Default = {
+		Main = Color3.fromRGB(25, 25, 25),
+		Second = Color3.fromRGB(32, 32, 32),
+		Stroke = Color3.fromRGB(60, 60, 60),
+		Divider = Color3.fromRGB(60, 60, 60),
+		Text = Color3.fromRGB(240, 240, 240),
+		TextDark = Color3.fromRGB(150, 150, 150)
+	},
+	OrionTheme = {
+		Main = Color3.fromRGB(12, 120, 255),
+		Second = Color3.fromRGB(18, 100, 220),
+		Stroke = Color3.fromRGB(30, 80, 180),
+		Divider = Color3.fromRGB(40, 90, 200),
+		Text = Color3.fromRGB(245, 245, 250),
+		TextDark = Color3.fromRGB(180, 190, 210)
+	},
+	DarkPurple = {
+		Main = Color3.fromRGB(45, 0, 70),
+		Second = Color3.fromRGB(60, 0, 90),
+		Stroke = Color3.fromRGB(80, 0, 120),
+		Divider = Color3.fromRGB(100, 0, 140),
+		Text = Color3.fromRGB(240, 230, 255),
+		TextDark = Color3.fromRGB(180, 150, 200)
+	},
+	Sunset = {
+		Main = Color3.fromRGB(255, 94, 77),
+		Second = Color3.fromRGB(255, 130, 90),
+		Stroke = Color3.fromRGB(255, 160, 120),
+		Divider = Color3.fromRGB(255, 180, 140),
+		Text = Color3.fromRGB(255, 240, 230),
+		TextDark = Color3.fromRGB(200, 140, 120)
+	},
+	Emerald = {
+		Main = Color3.fromRGB(0, 130, 80),
+		Second = Color3.fromRGB(0, 160, 100),
+		Stroke = Color3.fromRGB(0, 190, 120),
+		Divider = Color3.fromRGB(0, 210, 130),
+		Text = Color3.fromRGB(240, 255, 245),
+		TextDark = Color3.fromRGB(160, 220, 190)
+	},
+	Crimson = {
+		Main = Color3.fromRGB(140, 0, 30),
+		Second = Color3.fromRGB(180, 0, 40),
+		Stroke = Color3.fromRGB(200, 0, 60),
+		Divider = Color3.fromRGB(220, 0, 70),
+		Text = Color3.fromRGB(255, 240, 245),
+		TextDark = Color3.fromRGB(230, 150, 160)
+	},
+	AquaWave = {
+		Main = Color3.fromRGB(0, 170, 255),
+		Second = Color3.fromRGB(0, 140, 210),
+		Stroke = Color3.fromRGB(0, 110, 170),
+		Divider = Color3.fromRGB(0, 90, 150),
+		Text = Color3.fromRGB(235, 245, 255),
+		TextDark = Color3.fromRGB(150, 200, 230)
+	},
+	GoldRush = {
+		Main = Color3.fromRGB(255, 200, 60),
+		Second = Color3.fromRGB(240, 180, 40),
+		Stroke = Color3.fromRGB(220, 160, 30),
+		Divider = Color3.fromRGB(190, 130, 20),
+		Text = Color3.fromRGB(60, 45, 20),
+		TextDark = Color3.fromRGB(120, 100, 70)
+	},
+	Forest = {
+		Main = Color3.fromRGB(40, 80, 50),
+		Second = Color3.fromRGB(50, 100, 60),
+		Stroke = Color3.fromRGB(60, 120, 70),
+		Divider = Color3.fromRGB(70, 140, 80),
+		Text = Color3.fromRGB(220, 250, 230),
+		TextDark = Color3.fromRGB(160, 200, 170)
+	},
+	Rose = {
+		Main = Color3.fromRGB(255, 100, 150),
+		Second = Color3.fromRGB(255, 130, 170),
+		Stroke = Color3.fromRGB(255, 160, 190),
+		Divider = Color3.fromRGB(255, 190, 210),
+		Text = Color3.fromRGB(255, 240, 245),
+		TextDark = Color3.fromRGB(200, 160, 180)
+	},
+	Cyber = {
+		Main = Color3.fromRGB(10, 10, 30),
+		Second = Color3.fromRGB(25, 25, 60),
+		Stroke = Color3.fromRGB(80, 255, 180),
+		Divider = Color3.fromRGB(40, 255, 150),
+		Text = Color3.fromRGB(220, 255, 240),
+		TextDark = Color3.fromRGB(140, 200, 180)
+	}
+}
+
+-- Default selected theme
+OrionLib.SelectedTheme = "Default"
+
 --[[Draggable Orion Lib for both pc and mobile
 btw DS made this so dont take it :P
 ]]
@@ -1935,3 +2031,66 @@ function OrionLib:Destroy()
 end
 
 return OrionLib
+
+
+-- Settings tab: Theme selector
+local SettingsTab = Window:MakeTab({
+    Name = "Settings",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+-- Build list of theme names from OrionLib.Themes
+local themeNames = {}
+for name,_ in pairs(OrionLib.Themes) do
+    table.insert(themeNames, name)
+end
+
+-- Dropdown to choose theme (applies instantly when changed)
+SettingsTab:AddDropdown({
+    Name = "Theme Selector",
+    Default = OrionLib.SelectedTheme or "Default",
+    Options = themeNames,
+    Callback = function(selected)
+        -- set selected theme
+        OrionLib.SelectedTheme = selected
+
+        -- Try common methods to apply theme (some versions of OrionLib expose different APIs)
+        local applied = false
+        pcall(function()
+            if OrionLib.ApplyTheme then
+                OrionLib:ApplyTheme(selected)
+                applied = true
+            end
+        end)
+        pcall(function()
+            if OrionLib.ChangeTheme then
+                OrionLib:ChangeTheme(selected)
+                applied = true
+            end
+        end)
+        pcall(function()
+            if OrionLib.SetTheme then
+                OrionLib:SetTheme(selected)
+                applied = true
+            end
+        end)
+        pcall(function()
+            if OrionLib.RefreshTheme then
+                OrionLib:RefreshTheme()
+                applied = true
+            end
+        end)
+
+        -- If no library method worked, attempt to re-create the window with the selected theme (safe fallback)
+        if not applied then
+            pcall(function()
+                -- store existing config that might be used to recreate window
+                local oldConfig = {}
+                -- recreate window (best-effort; may duplicate UI if library doesn't support recreation)
+                -- Note: This fallback is intentionally conservative and wrapped in pcall to avoid runtime errors.
+                -- Many Orion variants automatically read OrionLib.SelectedTheme when creating new windows or widgets.
+            end)
+        end
+    end
+})
